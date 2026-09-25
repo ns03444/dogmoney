@@ -1,67 +1,64 @@
-# Weekly Card — Sportsbook Admin (dogmoney)
+# dogmoney — NFL Sportsbook (demo)
 
-Original sportsbook-style admin for Saturday NCAAF / NFL weekly cards. Vite + React + TypeScript + Tailwind. Not affiliated with any third-party sportsbook brand.
+Original NFL-only **paper sportsbook**. Place singles and parlays against Week 3 lines with a demo bankroll. Vite + React + TypeScript + Tailwind. Not affiliated with any real sportsbook brand.
+
+**No real money.** Stakes, balance, and bets live in `localStorage` only.
 
 ## Stack
 
 - Vite + React + TypeScript
 - Tailwind CSS v4 (`@tailwindcss/vite`)
 - lucide-react icons
-- recharts (weekly P/L area + stake bar)
-- react-router-dom (Dashboard · Saturday NCAAF/NFL · History)
+- react-router-dom
 
 ## Auth (demo only)
-
-Hardcoded client-side login for local demos:
 
 - Username: `admin`
 - Password: `admin`
 
-On success the app stores `wc_auth=1` in `localStorage`. Logout clears it and returns to `/login`. Unauthenticated visits to app routes redirect to `/login`.
+Stores `wc_auth=1` in `localStorage`. **Not production-secure.**
 
-**This is demo auth only — not production-secure.** Credentials are checked entirely in the browser; do not use this pattern for real accounts or sensitive data.
+## Routes
+
+| Path | Page |
+|------|------|
+| `/` | NFL Lines board (spread / ML / total) |
+| `/bets` | My Bets (open + settled) |
+| `/account` | Balance, demo reset, logout |
+| `/login` | Sign in |
+| `/nfl`, `/card`, `/ncaaf` | Redirect → `/` |
+| `/history` | Redirect → `/bets` |
+
+## Paper betting
+
+- Starting balance: **$1,000** (`dm_balance`)
+- Slip + bets persist: `dm_slip`, `dm_bets`
+- Tap odds on the board to add a leg; opposite side of the same game replaces the prior pick
+- 1 leg = single; 2+ = parlay (American odds combined via decimal multiply)
+- Place Bet deducts stake and records an Open bet
+
+## Data
+
+Edit **`src/data/nfl-week3.json`** for games, kickoffs, and markets.
 
 ## Run
 
 ```bash
-cd /workspace/bets-dashboard
 npm install
 npm run dev -- --host 0.0.0.0 --port 5173
 ```
-
-Open **http://localhost:5173** (login first).
-
-Production build:
 
 ```bash
 npm run build
 npm run preview -- --host 0.0.0.0 --port 5173
 ```
 
-## Edit this week’s data
+## Design
 
-Update **`src/data/week.json`**:
+- Emerald accents, dark mode, Card / Button / Badge
+- Sidebar brand: **dogmoney** · NFL Sportsbook
+- Desktop: sticky bet slip panel; mobile: FAB + bottom drawer
 
-- `weekLabel` / `weekShort` — header copy
-- `stats` — Risked, To win, Record, Open bets
-- `ncaaf` / `nfl` — suggestion cards, skips, focus notes
-- `weeklyPnL` / `stakeDistribution` — chart stubs
-- `history` — past weeks table
+## Deploy
 
-Save and the Vite HMR refresh picks it up.
-
-## Design notes
-
-- Dark-friendly admin shell with emerald accents
-- Top bar: week label + Live/Open badge when open bets exist
-- Sidebar: Weekly Card brand, Dashboard / Saturday (NCAAF, NFL) / History, admin user chip + logout
-- NCAAF badges use CFB (violet) styling
-- Mobile: hamburger offcanvas sidebar; denser admin chrome on desktop
-
-## Deploy notes
-
-`nginx.conf` uses SPA `try_files` fallback so `/login`, `/ncaaf`, `/nfl`, `/history` work behind Fly/nginx.
-
-## Scope
-
-Personal admin tracker. No third-party sportsbook branding. Do not push or deploy from this task unless asked.
+SPA nginx `try_files` for client routes. Fly app: `dogmoney`.

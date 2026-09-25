@@ -1,29 +1,23 @@
 import type { ComponentType } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard,
-  History,
   CircleDot,
   X,
-  GraduationCap,
-  Shield,
+  ListOrdered,
+  Ticket,
+  UserRound,
   LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/AuthContext'
+import { useSportsbook } from '@/context/SportsbookContext'
+import { formatMoney } from '@/lib/odds'
 
 const primaryNav = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-]
-
-const saturdayNav = [
-  { to: '/ncaaf', label: 'NCAAF', icon: GraduationCap },
-  { to: '/nfl', label: 'NFL', icon: Shield },
-]
-
-const secondaryNav = [
-  { to: '/history', label: 'History', icon: History },
+  { to: '/', label: 'NFL Lines', icon: ListOrdered, end: true },
+  { to: '/bets', label: 'My Bets', icon: Ticket },
+  { to: '/account', label: 'Account', icon: UserRound },
 ]
 
 interface SidebarProps {
@@ -39,6 +33,7 @@ function NavItem({
   end,
   collapsed,
   onClose,
+  badge,
 }: {
   to: string
   label: string
@@ -46,6 +41,7 @@ function NavItem({
   end?: boolean
   collapsed: boolean
   onClose: () => void
+  badge?: number
 }) {
   return (
     <NavLink
@@ -64,13 +60,24 @@ function NavItem({
       }
     >
       <Icon className="h-4 w-4 shrink-0" />
-      <span className={cn(collapsed && 'lg:hidden')}>{label}</span>
+      <span className={cn('flex-1', collapsed && 'lg:hidden')}>{label}</span>
+      {badge != null && badge > 0 && (
+        <span
+          className={cn(
+            'rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-bold text-white',
+            collapsed && 'lg:hidden',
+          )}
+        >
+          {badge}
+        </span>
+      )}
     </NavLink>
   )
 }
 
 export function Sidebar({ open, onClose, collapsed = false }: SidebarProps) {
   const { username, logout } = useAuth()
+  const { balance, openBetCount } = useSportsbook()
   const navigate = useNavigate()
 
   function handleLogout() {
@@ -107,10 +114,10 @@ export function Sidebar({ open, onClose, collapsed = false }: SidebarProps) {
             {!collapsed && (
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold tracking-tight">
-                  Weekly Card
+                  dogmoney
                 </div>
                 <div className="truncate text-[10px] font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
-                  Admin
+                  NFL Sportsbook
                 </div>
               </div>
             )}
@@ -126,28 +133,26 @@ export function Sidebar({ open, onClose, collapsed = false }: SidebarProps) {
           </Button>
         </div>
 
+        {!collapsed && (
+          <div className="border-b border-[var(--color-sidebar-border)] px-3 py-2.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
+              Balance
+            </p>
+            <p className="text-lg font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
+              {formatMoney(balance)}
+            </p>
+          </div>
+        )}
+
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
           {primaryNav.map((item) => (
-            <NavItem key={item.to} {...item} collapsed={collapsed} onClose={onClose} />
-          ))}
-
-          {!collapsed && (
-            <p className="mb-0.5 mt-3 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
-              Saturday
-            </p>
-          )}
-          {collapsed && (
-            <div className="my-1.5 hidden border-t border-[var(--color-sidebar-border)] lg:block" />
-          )}
-
-          {saturdayNav.map((item) => (
-            <NavItem key={item.to} {...item} collapsed={collapsed} onClose={onClose} />
-          ))}
-
-          <div className="my-1.5 border-t border-[var(--color-sidebar-border)]" />
-
-          {secondaryNav.map((item) => (
-            <NavItem key={item.to} {...item} collapsed={collapsed} onClose={onClose} />
+            <NavItem
+              key={item.to}
+              {...item}
+              collapsed={collapsed}
+              onClose={onClose}
+              badge={item.to === '/bets' ? openBetCount : undefined}
+            />
           ))}
         </nav>
 
@@ -160,7 +165,7 @@ export function Sidebar({ open, onClose, collapsed = false }: SidebarProps) {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-semibold">{username ?? 'admin'}</p>
                 <p className="truncate text-[10px] text-[var(--color-muted-foreground)]">
-                  Operator
+                  Demo
                 </p>
               </div>
               <Button

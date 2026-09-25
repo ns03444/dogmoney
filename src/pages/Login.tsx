@@ -49,11 +49,9 @@ export function Login() {
           <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/25">
             <CircleDot className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Weekly Card Admin
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">dogmoney</h1>
           <p className="mt-1.5 text-sm text-[var(--color-muted-foreground)]">
-            Sign in to manage this week&apos;s card
+            NFL sportsbook · paper betting demo
           </p>
         </div>
 
@@ -129,9 +127,9 @@ export function Login() {
           </form>
 
           <p className="mt-5 text-center text-[11px] leading-relaxed text-[var(--color-muted-foreground)]">
-            Demo auth only — credentials are checked client-side.
+            Demo auth only — no real money. Credentials checked client-side.
             <br />
-            Not for production use.
+            Default: admin / admin
           </p>
         </div>
       </div>

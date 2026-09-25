@@ -1,0 +1,232 @@
+{
+  "weekLabel": "NFL Week 3 · 2026",
+  "weekShort": "Week 3",
+  "games": [
+    {
+      "id": "lac-buf",
+      "away": "LAC",
+      "home": "BUF",
+      "awayName": "Chargers",
+      "homeName": "Bills",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "kickoffDisplay": "Sun 1:00 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": 7, "homeLine": -7, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": 280, "home": -350 },
+        "total": { "line": 50.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "car-cle",
+      "away": "CAR",
+      "home": "CLE",
+      "awayName": "Panthers",
+      "homeName": "Browns",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "kickoffDisplay": "Sun 1:00 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": -2.5, "homeLine": 2.5, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": -145, "home": 125 },
+        "total": { "line": 42.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "nyj-det",
+      "away": "NYJ",
+      "home": "DET",
+      "awayName": "Jets",
+      "homeName": "Lions",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "kickoffDisplay": "Sun 1:00 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": 6.5, "homeLine": -6.5, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": 255, "home": -310 },
+        "total": { "line": 48, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "hou-ind",
+      "away": "HOU",
+      "home": "IND",
+      "awayName": "Texans",
+      "homeName": "Colts",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "kickoffDisplay": "Sun 1:00 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": -2.5, "homeLine": 2.5, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": -150, "home": 130 },
+        "total": { "line": 42.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "ne-jax",
+      "away": "NE",
+      "home": "JAX",
+      "awayName": "Patriots",
+      "homeName": "Jaguars",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "kickoffDisplay": "Sun 1:00 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": 3, "homeLine": -3, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": 140, "home": -160 },
+        "total": { "line": 45.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "kc-mia",
+      "away": "KC",
+      "home": "MIA",
+      "awayName": "Chiefs",
+      "homeName": "Dolphins",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "kickoffDisplay": "Sun 1:00 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": -11.5, "homeLine": 11.5, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": -700, "home": 500 },
+        "total": { "line": 46.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "ten-nyg",
+      "away": "TEN",
+      "home": "NYG",
+      "awayName": "Titans",
+      "homeName": "Giants",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "kickoffDisplay": "Sun 1:00 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": 3, "homeLine": -3, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": 140, "home": -165 },
+        "total": { "line": 40.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "cin-pit",
+      "away": "CIN",
+      "home": "PIT",
+      "awayName": "Bengals",
+      "homeName": "Steelers",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "kickoffDisplay": "Sun 1:00 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": -3.5, "homeLine": 3.5, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": -185, "home": 155 },
+        "total": { "line": 42.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "sea-was",
+      "away": "SEA",
+      "home": "WAS",
+      "awayName": "Seahawks",
+      "homeName": "Commanders",
+      "kickoff": "2026-09-27T13:00:00-04:00",
+      "kickoffDisplay": "Sun 1:00 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": -7, "homeLine": 7, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": -320, "home": 255 },
+        "total": { "line": 40.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "ari-sf",
+      "away": "ARI",
+      "home": "SF",
+      "awayName": "Cardinals",
+      "homeName": "49ers",
+      "kickoff": "2026-09-27T16:05:00-04:00",
+      "kickoffDisplay": "Sun 4:05 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": 8.5, "homeLine": -8.5, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": 350, "home": -450 },
+        "total": { "line": 47.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "min-tb",
+      "away": "MIN",
+      "home": "TB",
+      "awayName": "Vikings",
+      "homeName": "Buccaneers",
+      "kickoff": "2026-09-27T16:25:00-04:00",
+      "kickoffDisplay": "Sun 4:25 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": -1.5, "homeLine": 1.5, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": -122, "home": 102 },
+        "total": { "line": 42.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "bal-dal",
+      "away": "BAL",
+      "home": "DAL",
+      "awayName": "Ravens",
+      "homeName": "Cowboys",
+      "kickoff": "2026-09-27T16:25:00-04:00",
+      "kickoffDisplay": "Sun 4:25 PM ET · Rio",
+      "status": "open",
+      "note": "International · Rio",
+      "markets": {
+        "spread": { "awayLine": -3, "homeLine": 3, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": -155, "home": 135 },
+        "total": { "line": 52.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "lv-no",
+      "away": "LV",
+      "home": "NO",
+      "awayName": "Raiders",
+      "homeName": "Saints",
+      "kickoff": "2026-09-27T16:25:00-04:00",
+      "kickoffDisplay": "Sun 4:25 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": 3, "homeLine": -3, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": 145, "home": -170 },
+        "total": { "line": 43.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "lar-den",
+      "away": "LAR",
+      "home": "DEN",
+      "awayName": "Rams",
+      "homeName": "Broncos",
+      "kickoff": "2026-09-27T20:20:00-04:00",
+      "kickoffDisplay": "Sun 8:20 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": -2.5, "homeLine": 2.5, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": -140, "home": 120 },
+        "total": { "line": 45.5, "overOdds": -110, "underOdds": -110 }
+      }
+    },
+    {
+      "id": "phi-chi",
+      "away": "PHI",
+      "home": "CHI",
+      "awayName": "Eagles",
+      "homeName": "Bears",
+      "kickoff": "2026-09-28T20:15:00-04:00",
+      "kickoffDisplay": "Mon 8:15 PM ET",
+      "status": "open",
+      "markets": {
+        "spread": { "awayLine": -4.5, "homeLine": 4.5, "awayOdds": -110, "homeOdds": -110 },
+        "moneyline": { "away": -220, "home": 185 },
+        "total": { "line": 41.5, "overOdds": -110, "underOdds": -110 }
+      }
+    }
+  ]
+}

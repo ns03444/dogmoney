@@ -1,8 +1,10 @@
-import { Menu, Moon, Sun, PanelLeftClose, PanelLeft, Radio } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Menu, Moon, Sun, PanelLeftClose, PanelLeft, Ticket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { useTheme } from '@/hooks/useTheme'
-import week from '@/data/week.json'
+import { useSportsbook } from '@/context/SportsbookContext'
+import { formatMoney } from '@/lib/odds'
+import week from '@/data/nfl-week3.json'
 
 interface HeaderProps {
   title: string
@@ -20,8 +22,7 @@ export function Header({
   onToggleCollapse,
 }: HeaderProps) {
   const { theme, toggle } = useTheme()
-  const openBets = week.stats?.openBets ?? 0
-  const isLive = openBets > 0
+  const { balance, openBetCount } = useSportsbook()
 
   return (
     <header className="sticky top-0 z-30 flex h-12 shrink-0 items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-background)]/95 px-3 backdrop-blur-md sm:px-4 lg:h-14 lg:px-5">
@@ -54,29 +55,33 @@ export function Header({
           <h1 className="truncate text-sm font-semibold tracking-tight sm:text-base">
             {title}
           </h1>
-          {isLive ? (
-            <Badge
-              variant="open"
-              className="inline-flex items-center gap-1 px-1.5 py-0 text-[10px] font-semibold uppercase tracking-wide"
-            >
-              <Radio className="h-2.5 w-2.5 animate-pulse" />
-              Live
-            </Badge>
-          ) : (
-            <Badge
-              variant="secondary"
-              className="px-1.5 py-0 text-[10px] font-semibold uppercase tracking-wide"
-            >
-              Closed
-            </Badge>
-          )}
         </div>
         <p className="truncate text-[11px] text-[var(--color-muted-foreground)] sm:text-xs">
           {week.weekShort}
           {subtitle ? ` · ${subtitle}` : ''}
-          {isLive ? ` · ${openBets} open` : ''}
         </p>
       </div>
+
+      <Link
+        to="/bets"
+        className="hidden items-center gap-1.5 rounded-lg border border-[var(--color-border)] px-2.5 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-accent)] sm:inline-flex"
+      >
+        <Ticket className="h-3.5 w-3.5" />
+        My Bets
+        {openBetCount > 0 && (
+          <span className="rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+            {openBetCount}
+          </span>
+        )}
+      </Link>
+
+      <Link
+        to="/account"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600/15 px-2.5 py-1.5 text-sm font-bold tabular-nums text-emerald-700 transition-colors hover:bg-emerald-600/25 dark:text-emerald-300"
+        title="Account & balance"
+      >
+        {formatMoney(balance)}
+      </Link>
 
       <Button
         variant="ghost"

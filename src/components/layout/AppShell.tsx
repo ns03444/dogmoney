@@ -2,20 +2,19 @@ import { useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
-import week from '@/data/week.json'
+import week from '@/data/nfl-week3.json'
 
 const titles: Record<string, { title: string; subtitle?: string }> = {
-  '/': { title: 'Dashboard', subtitle: week.focusDay },
-  '/ncaaf': { title: 'NCAAF', subtitle: 'CFB · Saturday slate' },
-  '/nfl': { title: 'NFL', subtitle: week.nfl.label },
-  '/history': { title: 'History', subtitle: 'Past weeks' },
+  '/': { title: 'NFL Lines', subtitle: week.weekLabel },
+  '/bets': { title: 'My Bets', subtitle: 'Open & settled' },
+  '/account': { title: 'Account', subtitle: 'Demo bankroll' },
 }
 
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const { pathname } = useLocation()
-  const meta = titles[pathname] ?? { title: 'Weekly Card' }
+  const meta = titles[pathname] ?? { title: 'dogmoney' }
 
   return (
     <div className="flex min-h-dvh w-full bg-[var(--color-muted)]/30 dark:bg-[var(--color-background)]">
