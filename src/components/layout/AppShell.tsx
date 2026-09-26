@@ -8,6 +8,7 @@ const titles: Record<string, { title: string; subtitle?: string }> = {
   '/': { title: 'NFL Lines', subtitle: week.weekLabel },
   '/bets': { title: 'My Bets', subtitle: 'Open & settled' },
   '/account': { title: 'Account', subtitle: 'Demo bankroll' },
+  '/admin': { title: 'Admin', subtitle: 'User management' },
 }
 
 export function AppShell() {

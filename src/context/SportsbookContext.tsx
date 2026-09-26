@@ -8,11 +8,16 @@ import {
   type ReactNode,
 } from 'react'
 import type { BetMode, MarketType, NflGame, PlacedBet, SelectionSide, SlipLeg } from '@/types'
+import { useAuth } from '@/context/AuthContext'
 import { combineAmericanOdds, formatLine, teaserOdds, toWinAmount } from '@/lib/odds'
 
 const BALANCE_KEY = 'dm_balance'
 const BETS_KEY = 'dm_bets'
 const SLIP_KEY = 'dm_slip'
+
+function userKey(key: string, userId: string | null) {
+  return `${key}_${userId ?? 'guest'}`
+}
 const STARTING_BALANCE = 1000
 
 interface SportsbookContextValue {
@@ -107,39 +112,46 @@ function buildLeg(
 }
 
 export function SportsbookProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth()
+  const [storageUserId, setStorageUserId] = useState<string | null>(user?.id ?? null)
   const [balance, setBalance] = useState(() =>
-    readNumber(BALANCE_KEY, STARTING_BALANCE),
+    readNumber(userKey(BALANCE_KEY, user?.id ?? null), STARTING_BALANCE),
   )
   const [slip, setSlip] = useState<SlipLeg[]>(() =>
-    readJson<SlipLeg[]>(SLIP_KEY, []),
+    readJson<SlipLeg[]>(userKey(SLIP_KEY, user?.id ?? null), []),
   )
   const [bets, setBets] = useState<PlacedBet[]>(() =>
-    readJson<PlacedBet[]>(BETS_KEY, []),
+    readJson<PlacedBet[]>(userKey(BETS_KEY, user?.id ?? null), []),
   )
 
   useEffect(() => {
-    try {
-      localStorage.setItem(BALANCE_KEY, String(balance))
-    } catch {
-      /* ignore */
-    }
-  }, [balance])
+    const userId = user?.id ?? null
+    setStorageUserId(userId)
+    setBalance(readNumber(userKey(BALANCE_KEY, userId), STARTING_BALANCE))
+    setSlip(readJson<SlipLeg[]>(userKey(SLIP_KEY, userId), []))
+    setBets(readJson<PlacedBet[]>(userKey(BETS_KEY, userId), []))
+  }, [user?.id])
 
   useEffect(() => {
+    if (!user?.id || storageUserId !== user.id) return
     try {
-      localStorage.setItem(SLIP_KEY, JSON.stringify(slip))
-    } catch {
-      /* ignore */
-    }
-  }, [slip])
+      localStorage.setItem(userKey(BALANCE_KEY, user.id), String(balance))
+    } catch { /* ignore */ }
+  }, [balance, storageUserId, user?.id])
 
   useEffect(() => {
+    if (!user?.id || storageUserId !== user.id) return
     try {
-      localStorage.setItem(BETS_KEY, JSON.stringify(bets))
-    } catch {
-      /* ignore */
-    }
-  }, [bets])
+      localStorage.setItem(userKey(SLIP_KEY, user.id), JSON.stringify(slip))
+    } catch { /* ignore */ }
+  }, [slip, storageUserId, user?.id])
+
+  useEffect(() => {
+    if (!user?.id || storageUserId !== user.id) return
+    try {
+      localStorage.setItem(userKey(BETS_KEY, user.id), JSON.stringify(bets))
+    } catch { /* ignore */ }
+  }, [bets, storageUserId, user?.id])
 
   const addToSlip = useCallback(
     (game: NflGame, market: MarketType, side: SelectionSide) => {

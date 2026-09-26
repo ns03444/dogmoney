@@ -7,6 +7,7 @@ import {
   Ticket,
   UserRound,
   LogOut,
+  ShieldCheck,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -76,7 +77,7 @@ function NavItem({
 }
 
 export function Sidebar({ open, onClose, collapsed = false }: SidebarProps) {
-  const { username, logout } = useAuth()
+  const { username, role, logout } = useAuth()
   const { balance, openBetCount } = useSportsbook()
   const navigate = useNavigate()
 
@@ -154,6 +155,15 @@ export function Sidebar({ open, onClose, collapsed = false }: SidebarProps) {
               badge={item.to === '/bets' ? openBetCount : undefined}
             />
           ))}
+          {role === 'admin' && (
+            <NavItem
+              to="/admin"
+              label="Admin"
+              icon={ShieldCheck}
+              collapsed={collapsed}
+              onClose={onClose}
+            />
+          )}
         </nav>
 
         <div className="border-t border-[var(--color-sidebar-border)] p-2">

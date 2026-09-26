@@ -6,131 +6,67 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 export function Login() {
-  const { isAuthenticated, login } = useAuth()
+  const { isAuthenticated, login, register } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const from =
-    (location.state as { from?: string } | null)?.from &&
-    (location.state as { from?: string }).from !== '/login'
-      ? (location.state as { from: string }).from
-      : '/'
-
+  const from = (location.state as { from?: string } | null)?.from && (location.state as { from?: string }).from !== '/login'
+    ? (location.state as { from: string }).from
+    : '/'
+  const [registering, setRegistering] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  if (isAuthenticated) {
-    return <Navigate to={from} replace />
-  }
+  if (isAuthenticated) return <Navigate to={from} replace />
 
-  function onSubmit(e: FormEvent) {
-    e.preventDefault()
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault()
     setError(null)
-    setSubmitting(true)
-    const ok = login(username.trim(), password)
-    setSubmitting(false)
-    if (ok) {
-      navigate(from, { replace: true })
-    } else {
-      setError('Invalid username or password.')
+    if (registering && password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
     }
+    setSubmitting(true)
+    const result = registering
+      ? await register(username.trim(), password)
+      : await login(username.trim(), password)
+    setSubmitting(false)
+    if (result.ok) navigate(from, { replace: true })
+    else setError(result.error ?? (registering ? 'Unable to create account.' : 'Invalid username or password.'))
   }
 
   return (
     <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[var(--color-background)] px-4 py-10">
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(16,185,129,0.12),_transparent_55%),radial-gradient(ellipse_at_bottom,_rgba(15,23,42,0.06),_transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top,_rgba(16,185,129,0.15),_transparent_50%),radial-gradient(ellipse_at_bottom,_rgba(0,0,0,0.4),_transparent_55%)]"
-        aria-hidden
-      />
-
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(16,185,129,0.12),_transparent_55%),radial-gradient(ellipse_at_bottom,_rgba(15,23,42,0.06),_transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top,_rgba(16,185,129,0.15),_transparent_50%),radial-gradient(ellipse_at_bottom,_rgba(0,0,0,0.4),_transparent_55%)]" aria-hidden />
       <div className="relative w-full max-w-md">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/25">
-            <CircleDot className="h-6 w-6" />
-          </div>
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/25"><CircleDot className="h-6 w-6" /></div>
           <h1 className="text-2xl font-semibold tracking-tight">dogmoney</h1>
-          <p className="mt-1.5 text-sm text-[var(--color-muted-foreground)]">
-            NFL sportsbook · paper betting demo
-          </p>
+          <p className="mt-1.5 text-sm text-[var(--color-muted-foreground)]">NFL sportsbook · paper betting only</p>
         </div>
 
         <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-xl shadow-black/5 dark:shadow-black/40 sm:p-8">
+          <div className="mb-5 flex rounded-lg bg-[var(--color-muted)] p-1">
+            {(['login', 'register'] as const).map((tab) => (
+              <button key={tab} type="button" onClick={() => { setRegistering(tab === 'register'); setError(null) }} className={cn('flex-1 rounded-md py-2 text-sm font-semibold capitalize transition-colors', registering === (tab === 'register') ? 'bg-emerald-600 text-white shadow-sm' : 'text-[var(--color-muted-foreground)]')}>{tab === 'login' ? 'Sign in' : 'Create account'}</button>
+            ))}
+          </div>
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="username"
-                className="text-xs font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]"
-              >
-                Username
-              </label>
-              <div className="relative">
-                <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-muted-foreground)]" />
-                <input
-                  id="username"
-                  name="username"
-                  autoComplete="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className={cn(
-                    'flex h-11 w-full rounded-lg border border-[var(--color-input)] bg-[var(--color-background)] pl-10 pr-3 text-sm',
-                    'outline-none ring-emerald-500/40 focus:border-emerald-500 focus:ring-2',
-                  )}
-                  placeholder="admin"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="password"
-                className="text-xs font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-muted-foreground)]" />
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={cn(
-                    'flex h-11 w-full rounded-lg border border-[var(--color-input)] bg-[var(--color-background)] pl-10 pr-3 text-sm',
-                    'outline-none ring-emerald-500/40 focus:border-emerald-500 focus:ring-2',
-                  )}
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-            </div>
-
-            {error && (
-              <p
-                role="alert"
-                className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/50 dark:text-rose-300"
-              >
-                {error}
-              </p>
-            )}
-
-            <Button
-              type="submit"
-              disabled={submitting}
-              className="mt-1 h-11 w-full bg-emerald-600 text-white hover:bg-emerald-500 hover:opacity-100"
-            >
-              {submitting ? 'Signing in…' : 'Sign in'}
-            </Button>
+            <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]" htmlFor="username">
+              Username
+              <span className="relative"><User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" /><input id="username" name="username" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} className="flex h-11 w-full rounded-lg border border-[var(--color-input)] bg-[var(--color-background)] pl-10 pr-3 text-sm font-normal normal-case outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/40" placeholder="admin" required /></span>
+            </label>
+            <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]" htmlFor="password">
+              Password
+              <span className="relative"><Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" /><input id="password" name="password" type="password" autoComplete={registering ? 'new-password' : 'current-password'} value={password} onChange={(e) => setPassword(e.target.value)} className="flex h-11 w-full rounded-lg border border-[var(--color-input)] bg-[var(--color-background)] pl-10 pr-3 text-sm font-normal normal-case outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/40" placeholder="••••••••" required /></span>
+            </label>
+            {registering && <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]" htmlFor="confirm-password">Confirm password<input id="confirm-password" type="password" autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="flex h-11 w-full rounded-lg border border-[var(--color-input)] bg-[var(--color-background)] px-3 text-sm font-normal normal-case outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/40" required /></label>}
+            {error && <p role="alert" className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/50 dark:text-rose-300">{error}</p>}
+            <Button type="submit" disabled={submitting} className="mt-1 h-11 w-full bg-emerald-600 text-white hover:bg-emerald-500 hover:opacity-100">{submitting ? 'Please wait…' : registering ? 'Create account' : 'Sign in'}</Button>
           </form>
-
-          <p className="mt-5 text-center text-[11px] leading-relaxed text-[var(--color-muted-foreground)]">
-            Demo auth only — no real money. Credentials checked client-side.
-            <br />
-            Default: admin / admin
-          </p>
+          <p className="mt-5 text-center text-[11px] leading-relaxed text-[var(--color-muted-foreground)]">Paper betting only — no real money.<br />Demo accounts: admin / admin · test / test123</p>
         </div>
       </div>
     </div>
