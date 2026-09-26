@@ -23,7 +23,9 @@ function BetCard({ bet }: { bet: PlacedBet }) {
           <CardTitle className="text-sm sm:text-base">
             {bet.type === 'parlay'
               ? `${bet.legs.length}-Leg Parlay`
-              : 'Single'}
+              : bet.type === 'teaser'
+                ? `${bet.legs.length}-Leg ${bet.teaserPoints ?? 6}-Point Teaser`
+                : 'Straight'}
           </CardTitle>
           <p className="mt-1 text-[11px] text-[var(--color-muted-foreground)]">
             {when} ET · {formatAmerican(bet.odds)}

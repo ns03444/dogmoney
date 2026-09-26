@@ -1,20 +1,27 @@
 import { useMemo, useState } from 'react'
 import { Ticket, Trash2, X } from 'lucide-react'
 import { useSportsbook } from '@/context/SportsbookContext'
+import type { BetMode } from '@/types'
 import { Button } from '@/components/ui/button'
-import { combineAmericanOdds, formatAmerican, formatMoney, toWinAmount } from '@/lib/odds'
+import { adjustTeaserLine, combineAmericanOdds, formatAmerican, formatLine, formatMoney, teaserOdds, toWinAmount } from '@/lib/odds'
 import { cn } from '@/lib/utils'
 
 interface BetSlipProps {
   mobileOpen?: boolean
   onMobileClose?: () => void
   variant?: 'panel' | 'drawer'
+  mode?: BetMode
+  teaserPoints?: number
+  onTeaserPointsChange?: (points: number) => void
 }
 
 export function BetSlip({
   mobileOpen = false,
   onMobileClose,
   variant = 'panel',
+  mode = 'straight',
+  teaserPoints = 6,
+  onTeaserPointsChange,
 }: BetSlipProps) {
   const { slip, removeFromSlip, clearSlip, placeBet, balance } = useSportsbook()
   const [stakeInput, setStakeInput] = useState('10')
@@ -23,19 +30,20 @@ export function BetSlip({
 
   const stake = Number(stakeInput)
   const combinedOdds = useMemo(
-    () => combineAmericanOdds(slip.map((l) => l.odds)),
-    [slip],
+    () => mode === 'teaser' ? teaserOdds(slip.length, teaserPoints) : combineAmericanOdds(slip.map((l) => l.odds)),
+    [slip, mode, teaserPoints],
   )
   const toWin = useMemo(
     () => (Number.isFinite(stake) && stake > 0 ? toWinAmount(stake, combinedOdds) : 0),
     [stake, combinedOdds],
   )
-  const betType = slip.length >= 2 ? 'Parlay' : 'Single'
+  const betType = mode === 'teaser' ? 'Teaser' : mode === 'parlay' ? 'Parlay' : 'Straight'
+  const modeLabel = mode === 'teaser' ? `${teaserPoints}-point teaser` : mode === 'parlay' ? 'multi-leg parlay' : mode === 'straight' ? 'single bet' : 'live betting'
 
   function handlePlace() {
     setError(null)
     setJustPlaced(false)
-    const result = placeBet(Number.isFinite(stake) ? stake : 0)
+    const result = placeBet(Number.isFinite(stake) ? stake : 0, mode, teaserPoints)
     if (!result.ok) {
       setError(result.error)
       return
@@ -45,12 +53,34 @@ export function BetSlip({
     onMobileClose?.()
   }
 
+  function displayLeg(leg: (typeof slip)[number]) {
+    if (mode !== 'teaser' || leg.line == null) return { label: leg.label, line: undefined }
+    const adjusted = adjustTeaserLine(leg.line, leg.side, teaserPoints)
+    if (leg.market === 'spread') {
+      return { label: `${leg.side === 'away' ? leg.away : leg.home} ${formatLine(adjusted)}`, line: adjusted }
+    }
+    return { label: `${leg.side === 'over' ? 'Over' : 'Under'} ${formatLine(adjusted)}`, line: adjusted }
+  }
+
+  const modeError = mode === 'straight' && slip.length > 1
+    ? 'Switch to Parlay for multi-leg, or remove selections until one leg remains.'
+    : mode === 'parlay' && slip.length < 2
+      ? 'Parlay mode requires 2+ legs.'
+      : mode === 'teaser' && (slip.length < 2 || slip.length > 4)
+        ? 'Teaser mode requires 2–4 spread or total legs.'
+        : mode === 'teaser' && slip.some((leg) => leg.market === 'moneyline')
+          ? 'Remove moneyline legs to place this teaser.'
+          : null
+
   const body = (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between gap-2 border-b border-[var(--color-border)] px-4 py-3">
         <div className="flex items-center gap-2">
           <Ticket className="h-4 w-4 text-emerald-600" />
-          <h2 className="text-sm font-semibold">Bet Slip</h2>
+          <div>
+            <h2 className="text-sm font-semibold">Bet Slip</h2>
+            <p className="text-[10px] capitalize text-[var(--color-muted-foreground)]">{modeLabel}</p>
+          </div>
           {slip.length > 0 && (
             <span className="rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
               {slip.length}
@@ -87,6 +117,21 @@ export function BetSlip({
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-3">
+        {mode === 'teaser' && (
+          <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50/60 p-2.5 dark:border-emerald-900/60 dark:bg-emerald-950/20">
+            <label className="flex items-center justify-between gap-2 text-xs font-semibold">
+              Teaser points
+              <select
+                value={teaserPoints}
+                onChange={(event) => onTeaserPointsChange?.(Number(event.target.value))}
+                className="rounded-md border border-[var(--color-input)] bg-[var(--color-background)] px-2 py-1 text-xs outline-none focus:border-emerald-500"
+              >
+                {[6, 6.5, 7].map((points) => <option key={points} value={points}>{points} pts</option>)}
+              </select>
+            </label>
+            <p className="mt-1 text-[10px] text-[var(--color-muted-foreground)]">Simplified demo payouts: 2-leg -120 · 3-leg +150 · 4-leg +200.</p>
+          </div>
+        )}
         {slip.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 px-4 py-10 text-center">
             <Ticket className="h-8 w-8 text-[var(--color-muted-foreground)]/40" />
@@ -109,9 +154,9 @@ export function BetSlip({
                     <p className="text-xs text-[var(--color-muted-foreground)]">
                       {leg.away} @ {leg.home}
                     </p>
-                    <p className="text-sm font-semibold">{leg.label}</p>
+                    <p className="text-sm font-semibold">{displayLeg(leg).label}</p>
                     <p className="text-[11px] text-[var(--color-muted-foreground)]">
-                      {leg.kickoffDisplay} · {leg.market}
+                      {leg.kickoffDisplay} · {leg.market}{mode === 'teaser' ? ' · adjusted' : ''}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
@@ -180,6 +225,12 @@ export function BetSlip({
             Balance {formatMoney(balance)}
           </p>
 
+          {modeError && (
+            <p role="status" className="mb-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300">
+              {modeError}
+            </p>
+          )}
+
           {error && (
             <p
               role="alert"
@@ -197,6 +248,7 @@ export function BetSlip({
           <Button
             className="h-11 w-full bg-emerald-600 text-white hover:bg-emerald-500 hover:opacity-100"
             onClick={handlePlace}
+            disabled={Boolean(modeError)}
           >
             Place Bet
           </Button>

@@ -45,3 +45,22 @@ export function formatMoney(n: number, digits = 2): string {
     maximumFractionDigits: digits,
   })
 }
+
+
+/** Move an NFL spread/total line in the bettor's favor for a teaser. */
+export function adjustTeaserLine(
+  line: number,
+  side: 'away' | 'home' | 'over' | 'under',
+  points: number,
+): number {
+  if (side === 'away' || side === 'over') return line + (side === 'over' ? -points : points)
+  return line + (side === 'under' ? points : -points)
+}
+
+/** Simplified demo teaser payout table. */
+export function teaserOdds(legs: number, _points: number): number {
+  if (legs === 2) return -120
+  if (legs === 3) return 150
+  if (legs === 4) return 200
+  return 0
+}

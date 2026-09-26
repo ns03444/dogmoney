@@ -1,4 +1,4 @@
-import type { NflGame } from '@/types'
+import type { BetMode, NflGame } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { OddsPill } from './OddsPill'
 import { useSportsbook } from '@/context/SportsbookContext'
@@ -6,11 +6,13 @@ import { cn } from '@/lib/utils'
 
 interface GameRowProps {
   game: NflGame
+  mode?: BetMode
 }
 
-export function GameRow({ game }: GameRowProps) {
+export function GameRow({ game, mode = 'straight' }: GameRowProps) {
   const { addToSlip, isOnSlip } = useSportsbook()
   const locked = game.status !== 'open'
+  const teaserMoneyline = mode === 'teaser'
   const { spread, moneyline, total } = game.markets
 
   return (
@@ -77,21 +79,21 @@ export function GameRow({ game }: GameRowProps) {
 
         <div>
           <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
-            Moneyline
+            Moneyline{teaserMoneyline ? ' · teaser unavailable' : ''}
           </p>
           <div className="grid grid-cols-2 gap-1.5">
             <OddsPill
               label={game.away}
               odds={moneyline.away}
               selected={isOnSlip(game.id, 'moneyline', 'away')}
-              disabled={locked}
+              disabled={locked || teaserMoneyline}
               onClick={() => addToSlip(game, 'moneyline', 'away')}
             />
             <OddsPill
               label={game.home}
               odds={moneyline.home}
               selected={isOnSlip(game.id, 'moneyline', 'home')}
-              disabled={locked}
+              disabled={locked || teaserMoneyline}
               onClick={() => addToSlip(game, 'moneyline', 'home')}
             />
           </div>

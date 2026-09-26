@@ -7,8 +7,8 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { MarketType, NflGame, PlacedBet, SelectionSide, SlipLeg } from '@/types'
-import { combineAmericanOdds, formatLine, toWinAmount } from '@/lib/odds'
+import type { BetMode, MarketType, NflGame, PlacedBet, SelectionSide, SlipLeg } from '@/types'
+import { combineAmericanOdds, formatLine, teaserOdds, toWinAmount } from '@/lib/odds'
 
 const BALANCE_KEY = 'dm_balance'
 const BETS_KEY = 'dm_bets'
@@ -24,7 +24,8 @@ interface SportsbookContextValue {
   removeFromSlip: (legId: string) => void
   clearSlip: () => void
   isOnSlip: (gameId: string, market: MarketType, side: SelectionSide) => boolean
-  placeBet: (stake: number) => { ok: true } | { ok: false; error: string }
+  placeBet: (stake: number, mode: BetMode, teaserPoints?: number) =>
+    { ok: true } | { ok: false; error: string }
   resetDemo: () => void
 }
 
@@ -173,18 +174,36 @@ export function SportsbookProvider({ children }: { children: ReactNode }) {
   )
 
   const placeBet = useCallback(
-    (stake: number): { ok: true } | { ok: false; error: string } => {
+    (stake: number, mode: BetMode, teaserPoints = 6): { ok: true } | { ok: false; error: string } => {
+      if (mode === 'live') return { ok: false, error: 'Live betting is coming soon.' }
       if (slip.length < 1) return { ok: false, error: 'Add at least one selection.' }
+      if (mode === 'straight' && slip.length !== 1) {
+        return { ok: false, error: 'Switch to Parlay for multi-leg bets, or remove selections until one leg remains.' }
+      }
+      if (mode === 'parlay' && slip.length < 2) {
+        return { ok: false, error: 'Parlays require at least 2 legs.' }
+      }
+      if (mode === 'teaser') {
+        if (slip.length < 2 || slip.length > 4) {
+          return { ok: false, error: 'Teasers require 2 to 4 legs.' }
+        }
+        if (slip.some((leg) => leg.market === 'moneyline')) {
+          return { ok: false, error: 'Teasers can only use spread and total legs.' }
+        }
+      }
       if (!(stake > 0)) return { ok: false, error: 'Enter a stake greater than $0.' }
       if (stake > balance)
         return { ok: false, error: 'Stake exceeds available balance.' }
 
-      const odds = combineAmericanOdds(slip.map((l) => l.odds))
+      const odds = mode === 'teaser'
+        ? teaserOdds(slip.length, teaserPoints)
+        : combineAmericanOdds(slip.map((l) => l.odds))
       const toWin = toWinAmount(stake, odds)
       const bet: PlacedBet = {
         id: `bet_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
         placedAt: new Date().toISOString(),
-        type: slip.length >= 2 ? 'parlay' : 'single',
+        type: mode === 'teaser' ? 'teaser' : slip.length >= 2 ? 'parlay' : 'single',
+        teaserPoints: mode === 'teaser' ? teaserPoints : undefined,
         legs: [...slip],
         stake,
         odds,

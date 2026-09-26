@@ -2,6 +2,7 @@ export type GameStatus = 'open' | 'locked' | 'final'
 export type MarketType = 'spread' | 'moneyline' | 'total'
 export type SelectionSide = 'away' | 'home' | 'over' | 'under'
 export type BetStatus = 'Open' | 'Won' | 'Lost' | 'Push' | 'Void'
+export type BetMode = 'straight' | 'parlay' | 'teaser' | 'live'
 
 export interface SpreadMarket {
   awayLine: number
@@ -62,7 +63,8 @@ export interface SlipLeg {
 export interface PlacedBet {
   id: string
   placedAt: string
-  type: 'single' | 'parlay'
+  type: 'single' | 'parlay' | 'teaser'
+  teaserPoints?: number
   legs: SlipLeg[]
   stake: number
   odds: number
